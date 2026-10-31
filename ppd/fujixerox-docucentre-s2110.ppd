@@ -114,12 +114,12 @@
 *CloseUI: *Duplex
 
 *% 节墨模式 (Toner Save)
-*OpenUI *JCLTonerSave/Toner Save Mode: PickOne
-*OrderDependency: 40 JCLSetup *JCLTonerSave
-*DefaultJCLTonerSave: Standard
-*JCLTonerSave Standard/Standard (标准省墨关): ""
-*JCLTonerSave Save/Save (节墨开启): ""
-*CloseUI: *JCLTonerSave
+*OpenUI *TonerSave/Toner Save Mode: PickOne
+*OrderDependency: 40 AnySetup *TonerSave
+*DefaultTonerSave: Standard
+*TonerSave Standard/Standard (标准省墨关): ""
+*TonerSave Save/Save (节墨开启): ""
+*CloseUI: *TonerSave
 
 *% 复合机特有 JCL 协议头注入定义
 *JCLBegin: "<1B>%-12345X@PJL<0D><0A>"
