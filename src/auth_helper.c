@@ -1,6 +1,6 @@
 /*
  * Fuji Xerox DocuCentre S2110 macOS GUI Wizard & Activation Helper
- * Compiled as Native Mach-O to protect Secret Key & 2FA Logic from plaintext reading
+ * Unified Universal Algorithm Edition (Compatible with Universal Master Keygen)
  */
 
 #include <stdio.h>
@@ -9,14 +9,18 @@
 #include <time.h>
 #include <CommonCrypto/CommonHMAC.h>
 
-/* volatile 阻止编译器常量折叠 (Defeat Constant Folding) */
+/* 统一全品牌母私钥 K_BOX (volatile 阻断编译期常量折叠)
+ * 对应明文: MACOS_COMMERCIAL_PRINTER_DRIVER_UNIVERSAL_SECRET_2026_@#! (长度 57 字节)
+ */
 static volatile const unsigned char K_BOX[] = {
-    0x34, 0x17, 0x2e, 0x21, 0x34, 0x31, 0x2d, 0xce, 0xcb, 0xcb,
-    0xcc, 0x31, 0x1f, 0x1b, 0x1d, 0x21, 0x2d, 0x31, 0x2d, 0x17,
-    0x1d, 0x2e, 0x17, 0x28, 0x31, 0x2d, 0x1b, 0x20, 0x28, 0x31,
-    0xce, 0xcc, 0xce, 0xca, 0x31, 0x1c, 0xbd, 0xbb
+    0x1f, 0x1b, 0x1d, 0x21, 0x2d, 0x31, 0x1d, 0x21, 0x1f, 0x1f,
+    0x17, 0x2e, 0x1d, 0x23, 0x1b, 0x20, 0x31, 0x2c, 0x2e, 0x23,
+    0x22, 0x28, 0x17, 0x2e, 0x31, 0x18, 0x2e, 0x23, 0x2a, 0x17,
+    0x2e, 0x31, 0x27, 0x22, 0x23, 0x2a, 0x17, 0x2e, 0x2d, 0x1b,
+    0x20, 0x31, 0x2d, 0x17, 0x1d, 0x2e, 0x17, 0x28, 0x31, 0xce,
+    0xcc, 0xce, 0xca, 0x31, 0x1c, 0xbd, 0xbb
 };
-#define K_LEN 38
+#define K_LEN 57
 
 __attribute__((noinline)) static void restore_secret(unsigned char *out) {
     for (size_t i = 0; i < K_LEN; i++) {
@@ -36,8 +40,7 @@ int main(int argc, char *argv[]) {
     restore_secret(secret);
 
     if (strcmp(action, "verify") == 0) {
-        /* 7天动态时效滑动窗口 (当前窗口及前后各 1 个窗口，防时钟轻微漂移) */
-        long long step = 7 * 86400;
+        long long step = 7 * 86400; // 7天滑动时钟窗口
         long long cur_window = time(NULL) / step;
 
         int passed = 0;
@@ -63,7 +66,6 @@ int main(int argc, char *argv[]) {
         }
 
         if (passed) {
-            /* 验证成功，推导该 Mac 的永久授权凭证 */
             char perm_msg[256];
             snprintf(perm_msg, sizeof(perm_msg), "PERM_AUTH:%s", hw_uuid);
 
@@ -82,7 +84,6 @@ int main(int argc, char *argv[]) {
         memset(secret, 0, sizeof(secret));
         return 1;
     } else if (strcmp(action, "check") == 0) {
-        /* 本地永久证书快速静默校验 */
         char perm_msg[256];
         snprintf(perm_msg, sizeof(perm_msg), "PERM_AUTH:%s", hw_uuid);
 

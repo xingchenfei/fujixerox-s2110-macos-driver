@@ -113,15 +113,16 @@ jobs:
           name: FujiXerox_DocuCentre_S2110_Commercial_Driver
           path: FujiXerox_DocuCentre_S2110_Mac_Driver.dmg
 
-      - name: Create GitHub Release v1.2.0
+      - name: Create GitHub Release v2.0.0
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.2.0
-          name: "Fuji Xerox DocuCentre S2110 macOS Commercial Driver (独立研发纯C重构版) v1.2.0"
+          tag_name: v2.0.0
+          name: "Fuji Xerox DocuCentre S2110 macOS Driver (全品牌统一算号版) v2.0.0"
           body: |
-            ### 富士施乐 (Fuji Xerox) DocuCentre S2110 macOS 专用独立研发驱动 (DMG 安装包)
+            ### 富士施乐 (Fuji Xerox) DocuCentre S2110 macOS 专用独立研发驱动 (DMG 安装包 - 统一算号版)
             
+            - **接入全品牌统一离线算号体系 (Universal Keygen Protocol)**：一套算号器即可通发施乐、夏普、东芝、理光等所有品牌；
             - **作者亲自编写与调优的高性能 C 语言原生驱动套件**；
             - **集成一机一码防盗版授权体系**：
               - 硬件主板 UUID 物理强绑定（IOKit / IOPlatformUUID）；
