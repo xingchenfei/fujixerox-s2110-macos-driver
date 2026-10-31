@@ -494,6 +494,7 @@ int main(int argc, char *argv[]) {
                    "@PJL USTATUS PAGE=ON\r\n"
                    "@PJL INFO STATUS\r\n"
                    "@PJL JOB NAME=\"034445534B546E20%08X\"\r\n"
+                   "@PJL SET JOBMODE=PRINTER\r\n"
                    "@PJL JOB MODE=PRINTER\r\n"
                    "@PJL SET STRINGCODESET=UTF8\r\n"
                    "@PJL COMMENT DATE=%s\r\n"
