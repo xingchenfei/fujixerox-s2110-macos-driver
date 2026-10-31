@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>macOS 商业打印机驱动 通用离线算号发卡平台 (卖家专属)</title>
+<style>
+  :root {
+    --primary: #0071e3;
+    --primary-hover: #0077ed;
+    --bg: #f5f5f7;
+    --card-bg: #ffffff;
+    --text: #1d1d1f;
+    --text-sec: #86868b;
+    --border: #d2d2d7;
+    --success: #34c759;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "PingFang SC", sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+  }
+  .card {
+    background: var(--card-bg);
+    padding: 36px 32px;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 480px;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .header h2 {
+    margin: 0 0 8px 0;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .badge {
+    background: #e8f3ff;
+    color: var(--primary);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: inline-block;
+  }
+  .desc {
+    font-size: 13px;
+    color: var(--text-sec);
+    margin-top: 10px;
+  }
+  .form-group {
+    margin-bottom: 18px;
+  }
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  input, select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #fff;
+  }
+  input:focus, select:focus {
+    border-color: var(--primary);
+  }
+  button.btn-gen {
+    width: 100%;
+    padding: 13px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 6px;
+  }
+  button.btn-gen:hover {
+    background: var(--primary-hover);
+  }
+  .result-box {
+    margin-top: 24px;
+    padding: 20px;
+    background: #fbfbfd;
+    border: 2px dashed #0071e3;
+    border-radius: 12px;
+    display: none;
+    text-align: center;
+  }
+  .res-label {
+    font-size: 13px;
+    color: var(--text-sec);
+    margin-bottom: 6px;
+  }
+  .res-key {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: 2px;
+    margin: 10px 0;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    user-select: all;
+  }
+  .res-hint {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  button.btn-copy {
+    background: var(--success);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  button.btn-copy:hover {
+    opacity: 0.9;
+  }
+  .copy-tip {
+    font-size: 12px;
+    color: var(--success);
+    margin-top: 8px;
+    display: none;
+    font-weight: 500;
+  }
+  .footer-tip {
+    font-size: 12px;
+    color: var(--text-sec);
+    text-align: center;
+    margin-top: 20px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <span class="badge">全品牌通用 · 统一授权中枢</span>
+    <h2>macOS 打印机驱动发卡算号器</h2>
+    <div class="desc">支持夏普、富士施乐、东芝、理光、佳能等全系列驱动</div>
+  </div>
+
+  <div class="form-group">
+    <label for="brand">选择打印机品牌 / 驱动系列：</label>
+    <select id="brand">
+      <option value="UNIVERSAL">🌟 通用全品牌统一算法 (推荐 - 所有驱动通用)</option>
+      <option value="FUJIXEROX">富士施乐 (Fuji Xerox DocuCentre 全系列)</option>
+      <option value="SHARP">夏普 (SHARP SF / BP / MX 全系列)</option>
+      <option value="TOSHIBA">东芝 (TOSHIBA e-STUDIO 系列)</option>
+      <option value="RICOH">理光 (Ricoh Aficio / MP 系列)</option>
+      <option value="CANON">佳能 (Canon iR / imageRUNNER 系列)</option>
+      <option value="PANTUM">奔图 (Pantum 系列)</option>
+      <option value="OTHER">其他独立研发驱动</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="hwid">买家提供的【Mac 硬件识别码 / UUID】：</label>
+    <input type="text" id="hwid" placeholder="例如: 4C4C4544-0046-XXXX-XXXX-XXXXXXXXXXXX" autocomplete="off">
+  </div>
+
+  <button class="btn-gen" onclick="generateKey()">一键生成 7 天激活码</button>
+
+  <div class="result-box" id="resBox">
+    <div class="res-label">买家专属激活密钥：</div>
+    <div class="res-key" id="resKey">----</div>
+    <div class="res-hint">⏱️ 7 天内有效，换电脑或过期自动失效；在买家电脑上激活后将自动转换为该机终生永久授权。</div>
+    <button class="btn-copy" onclick="copyKey()">点击复制完整卡密信息</button>
+    <div class="copy-tip" id="copyTip">已复制卡密与使用指引！可直接粘贴发给买家。</div>
+  </div>
+
+  <div class="footer-tip">
+    🔒 纯本地 WebCrypto 原生密码学运算 · 断网离线可用 · 手机与电脑浏览器通用
+  </div>
+</div>
+
+<script>
+// 全平台统一定义的标准主私钥
+const UNIVERSAL_MASTER_SECRET = "MACOS_COMMERCIAL_PRINTER_DRIVER_UNIVERSAL_SECRET_2026_@#!";
+const STEP_7_DAYS = 7 * 86400; // 604800 秒 (7 天滑动时钟窗口)
+
+async function hmacSha256(keyStr, messageStr) {
+    const enc = new TextEncoder();
+    const keyData = enc.encode(keyStr);
+    const msgData = enc.encode(messageStr);
+    const key = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const signature = await crypto.subtle.sign("HMAC", key, msgData);
+    return new Uint8Array(signature);
+}
+
+async function generateKey() {
+    let raw = document.getElementById("hwid").value.trim();
+    if (!raw) {
+        alert("请输入买家提供的 Mac 硬件识别码！");
+        return;
+    }
+    
+    // 过滤杂质，保留大写标准 UUID
+    let cleanHw = raw.toUpperCase().replace(/[^A-F0-9-]/g, "");
+    if (cleanHw.length < 8) {
+        alert("硬件识别码格式不完整，请让买家重新复制！");
+        return;
+    }
+    
+    let windowIdx = Math.floor(Date.now() / 1000 / STEP_7_DAYS);
+    let msg = `ACTIVATION:${cleanHw}:${windowIdx}`;
+    
+    let sig = await hmacSha256(UNIVERSAL_MASTER_SECRET, msg);
+    let hex = Array.from(sig.slice(0, 6)).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+    let formattedKey = `${hex.substr(0,4)}-${hex.substr(4,4)}-${hex.substr(8,4)}`;
+    
+    document.getElementById("resKey").innerText = formattedKey;
+    document.getElementById("resBox").style.display = "block";
+    document.getElementById("copyTip").style.display = "none";
+}
+
+function copyKey() {
+    let key = document.getElementById("resKey").innerText;
+    let hwid = document.getElementById("hwid").value.trim();
+    let textToCopy = `【您的专属驱动激活码】: ${key}\n(7天内有效，输入激活后即锁定该机终生永久授权，请在安装向导中输入)`;
+    
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        document.getElementById("copyTip").style.display = "block";
+    }).catch(() => {
+        navigator.clipboard.writeText(key).then(() => {
+            document.getElementById("copyTip").style.display = "block";
+        });
+    });
+}
+</script>
+
+</body>
+</html>
