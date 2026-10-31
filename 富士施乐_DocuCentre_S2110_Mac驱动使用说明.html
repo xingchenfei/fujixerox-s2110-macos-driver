@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>富士施乐 DocuCentre S2110 macOS 专用驱动 - 安装与使用指南</title>
+<title>富士施乐 DocuCentre S2110 macOS 独立研发专用驱动 - 安装与使用指南</title>
 <style>
   :root {
     --primary: #0071e3;
@@ -72,7 +72,7 @@
   .hero p {
     font-size: 17px;
     color: var(--text-sec);
-    max-width: 600px;
+    max-width: 650px;
     margin: 0 auto;
   }
   .card {
@@ -153,38 +153,45 @@
 
 <header>
   <div class="header-title">
-    <span>🖨️ 富士施乐 DocuCentre S2110 macOS 驱动</span>
-    <span class="badge">HBPL 原生重构版</span>
+    <span>🖨️ 富士施乐 DocuCentre S2110 macOS 专用驱动</span>
+    <span class="badge">独立自主研发 · 原生纯C全功能版</span>
   </div>
   <div>
-    <span style="font-size:12px;color:var(--text-sec);">适配 macOS Monterey / Ventura / Sonoma / Sequoia</span>
+    <span style="font-size:12px;color:var(--text-sec);">全面适配 macOS Monterey / Ventura / Sonoma / Sequoia</span>
   </div>
 </header>
 
 <div class="container">
   <div class="hero">
-    <h1>富士施乐数码复合机 macOS 专用驱动</h1>
-    <p>免购置 PostScript 硬件扩展卡 · 600 DPI 矢量级高清解析 · 原生双面与多纸盒支持</p>
+    <h1>富士施乐数码复合机 macOS 独立研发驱动</h1>
+    <p>作者亲自编写 · 免购置 PostScript 硬件扩展卡 · 600 DPI 矢量级高清解析 · 原生双面与多纸盒控制</p>
   </div>
 
   <div class="card">
-    <h2><span class="step-num">!</span> 为什么需要本驱动？</h2>
-    <p>富士施乐（Fuji Xerox）中小型商用复合机（如 <strong>DocuCentre S2110 / S2011 / S2320 / S2520</strong> 等）出厂采用主机端压缩打印语言 <strong>HBPL</strong>。官方未标配昂贵的 PostScript 芯片，导致在 Mac 上直接使用通用驱动会出现：</p>
+    <h2><span class="step-num">!</span> 为什么需要本独立研发驱动？</h2>
+    <p>富士施乐（Fuji Xerox）中小型商用复合机（如 <strong>DocuCentre S2110 / S2011 / S2320 / S2520</strong> 等）出厂采用主机端压缩打印语言 <strong>HBPL</strong>。由于厂商未向 Mac 平台提供对应免卡驱动，且出厂未标配昂贵的 PostScript 芯片，导致在 Mac 上直接使用通用驱动会出现：</p>
     <ul>
-      <li><strong>狂吐废纸</strong>：打印机连续吐出带有 <code>%!PS-Adobe-3.0</code> 或代码乱码的多张废纸。</li>
-      <li><strong>文字发灰有锯齿</strong>：macOS 内置通用 PCL 锁死在 300 DPI 点阵抖动，文字毛刺严重。</li>
-      <li><strong>本驱动解决方案</strong>：逆向原厂 Windows 通信协议，打造专供 macOS 的 CUPS 滤镜，直接输出纯正的 600 DPI HBPL 二进制流，字迹锐利纯黑，出纸顺畅。</li>
+      <li><strong>狂吐废纸</strong>：打印机连续吐出带有 <code>%!PS-Adobe-3.0</code> 等代码的乱码废纸。</li>
+      <li><strong>文字发灰有锯齿</strong>：macOS 系统自带通用 PCL 锁死在 300 DPI 粗糙点阵抖动，文字毛刺发灰严重。</li>
+      <li><strong>本驱动解决方案</strong>：<strong>由作者独立全手工编写的 macOS 原生专用高性能 CUPS 打印滤镜与驱动套件（纯 C 语言机器码打造，适配 Apple Silicon M系列与 Intel 双架构）</strong>。直连打印机底层输出 600 DPI 纯正矢量黑白 HBPL 硬件控制流，字迹锐利纯黑，出纸稳定顺畅，彻底让 Mac 摆脱官方硬件扩展卡的昂贵束缚！</li>
     </ul>
   </div>
 
   <div class="card">
-    <h2><span class="step-num">1</span> 方式一：使用图形向导 App 安装（推荐）</h2>
+    <h2><span class="step-num">1</span> 方式一：使用图形向导 App 激活与安装（推荐）</h2>
     <ol>
       <li>双击打开下载的 <strong><code>FujiXerox_DocuCentre_S2110_Mac_Driver.dmg</code></strong> 镜像。</li>
       <li>双击运行 <strong>「富士施乐打印机一键配置向导.app」</strong>。</li>
-      <li>根据向导提示选择连接方式：
+      <li><strong>一机一码安全激活</strong>：
         <ul>
-          <li><strong>网络打印 (TCP/IP)</strong>：输入打印机的局域网 IP（例如 <code>192.168.1.200</code>），向导将严格校验 IPv4 格式。</li>
+          <li>首次运行时，向导已<strong>自动将您 Mac 的主板硬件识别代码复制到剪贴板</strong>。</li>
+          <li>将代码发送给作者获取专属 7 天时效激活密钥（格式：<code>XXXX-XXXX-XXXX</code>），输入密钥点击“验证激活”。</li>
+          <li>验证成功后，系统自动绑定该机永久授权，无需重复激活。</li>
+        </ul>
+      </li>
+      <li>选择连接方式：
+        <ul>
+          <li><strong>网络打印 (TCP/IP)</strong>：输入复合机局域网 IP（例如 <code>192.168.1.200</code>），向导将严格校验 IPv4 格式。</li>
           <li><strong>USB 直连</strong>：插上 USB 数据线，向导会自动识别并绑定设备。</li>
         </ul>
       </li>
@@ -195,7 +202,7 @@
 
   <div class="card">
     <h2><span class="step-num">2</span> 方式二：双击终端脚本安装</h2>
-    <p>如果您习惯终端操作，或在无界面批量分发环境下：</p>
+    <p>如果您习惯终端操作，或在批量维护分发环境下：</p>
     <ol>
       <li>打开 DMG 镜像，直接双击运行 <strong><code>双击安装驱动.command</code></strong>。</li>
       <li>终端将自动引导选择连接类型与输入 IP 地址，并完成系统 CUPS 队列注册。</li>
@@ -207,7 +214,7 @@
     <div class="tag-grid">
       <div class="tag-item">
         <strong>⚡ 600 DPI 矢量级高清解析</strong>
-        <span>点对点纯黑锐利字体，消灭发灰与毛刺锯齿。</span>
+        <span>纯正点对点锐利黑体，彻底消除发灰与点阵毛刺。</span>
       </div>
       <div class="tag-item">
         <strong>📄 丰富纸张尺寸支持</strong>
@@ -219,7 +226,7 @@
       </div>
       <div class="tag-item">
         <strong>📥 多纸盒进纸管理</strong>
-        <span>支持自动选择、第一纸盒、第二纸盒（选配）及旁路手送托盘。</span>
+        <span>支持自动选择、第一纸盒、第二纸盒（选配件）及旁路手送托盘。</span>
       </div>
     </div>
   </div>
