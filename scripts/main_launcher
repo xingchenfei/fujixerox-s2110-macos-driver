@@ -1,0 +1,137 @@
+#!/bin/bash
+# ==============================================================================
+# 富士施乐 (Fuji Xerox) DocuCentre S2110 / S2011 macOS 图形化安装配置向导
+# 针对 HBPL 协议原生重构，免去购买 PostScript 硬件扩充模块
+# ==============================================================================
+
+APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+SUPPORT_DIR="${APP_DIR}/SharedSupport"
+PPD_FILE="${SUPPORT_DIR}/ppd/fujixerox-docucentre-s2110.ppd"
+FILTER_BIN="${SUPPORT_DIR}/filters/rastertohbpl"
+
+# 1. 欢迎与连接方式选择对话框
+CONN_CHOICE=$(osascript << 'EOF'
+try
+    set dlg to display dialog "【富士施乐 DocuCentre S2110 专用驱动安装向导】\n\n本驱动原生支持 HBPL (Host Based Print Language) 协议，无需购置昂贵的 PostScript (PS) 硬件扩展卡，支持 600 DPI 矢量级高清打印与原生双面打印。\n\n请选择您的打印机连接方式：" with title "富士施乐配置向导 (1/2)" buttons {"取消", "USB 直连", "网络打印 (TCP/IP)"} default button "网络打印 (TCP/IP)" with icon note
+    return button returned of dlg
+on error number -128
+    return "CANCELLED"
+end try
+EOF
+)
+
+if [ "$CONN_CHOICE" = "CANCELLED" ] || [ -z "$CONN_CHOICE" ]; then
+    exit 0
+fi
+
+PRINTER_URI=""
+PRINTER_LOCATION="办公区"
+
+if [ "$CONN_CHOICE" = "网络打印 (TCP/IP)" ]; then
+    # 2. 采集打印机 IP 地址并执行严格 IPv4 校验
+    DEFAULT_IP_HINT="192.168.1.200"
+
+    while true; do
+        IP_RESULT=$(osascript << EOF
+try
+    set dlg to display dialog "【打印机网络连接】\n\n请输入富士施乐数码复合机的局域网 IPv4 地址:\n(例如: 192.168.1.200)" default answer "$DEFAULT_IP_HINT" with title "富士施乐配置向导 (2/2)" buttons {"取消", "下一步"} default button "下一步" with icon note
+    return text returned of dlg
+on error number -128
+    return "CANCELLED"
+end try
+EOF
+)
+
+        if [ "$IP_RESULT" = "CANCELLED" ] || [ -z "$IP_RESULT" ]; then
+            exit 0
+        fi
+
+        CLEAN_IP=$(echo "$IP_RESULT" | tr -d '[:space:]')
+
+        # 严格 IPv4 正则校验
+        if echo "$CLEAN_IP" | grep -Eq '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'; then
+            if [ "$CLEAN_IP" != "0.0.0.0" ] && [ "$CLEAN_IP" != "255.255.255.255" ]; then
+                PRINTER_URI="socket://${CLEAN_IP}:9100"
+                PRINTER_LOCATION="局域网 (${CLEAN_IP})"
+                break
+            fi
+        fi
+
+        DEFAULT_IP_HINT="$CLEAN_IP"
+        osascript -e "display alert \"IP 地址格式错误\" message \"您输入的「$CLEAN_IP」不是合法的 IPv4 地址格式！\n\n正确格式示例: 192.168.1.200\n规则: 必须由 4 组 0~255 之间的数字并以圆点分隔。\" as warning"
+    done
+else
+    # USB 直连探测
+    DETECTED_URI=$(lpinfo -v 2>/dev/null | grep -i -E "direct usb://|0550|s2110|s2011|docucentre" | head -n 1 | awk '{print $2}')
+    if [ -n "$DETECTED_URI" ]; then
+        PRINTER_URI="$DETECTED_URI"
+    else
+        PRINTER_URI="usb://Fuji%20Xerox/DocuCentre%20S2110?serial=S2110"
+    fi
+    PRINTER_LOCATION="USB 本地接口"
+fi
+
+# 3. 生成安全部署临时脚本
+TEMP_INSTALL_SH="/tmp/fujixerox_install_exec.sh"
+cat << INSTALL_EOF > "$TEMP_INSTALL_SH"
+#!/bin/bash
+set -e
+
+# 创建系统级打印机驱动与滤镜目录
+mkdir -p /Library/Printers/FujiXerox/Filters
+mkdir -p /Library/Printers/FujiXerox/Custom
+mkdir -p /Library/Printers/PPDs/Contents/Resources
+
+# 安装原生滤镜
+cp -f "${FILTER_BIN}" /Library/Printers/FujiXerox/Filters/rastertohbpl
+chmod 755 /Library/Printers/FujiXerox/Filters/rastertohbpl
+chown root:wheel /Library/Printers/FujiXerox/Filters/rastertohbpl
+
+# 安装 PPD 设备描述文件
+cp -f "${PPD_FILE}" /Library/Printers/PPDs/Contents/Resources/fujixerox-docucentre-s2110.ppd
+chmod 644 /Library/Printers/PPDs/Contents/Resources/fujixerox-docucentre-s2110.ppd
+chown root:wheel /Library/Printers/PPDs/Contents/Resources/fujixerox-docucentre-s2110.ppd
+
+# 注册 CUPS 打印机队列
+QUEUE_NAME="Fuji_Xerox_DocuCentre_S2110"
+PPD_TARGET="/Library/Printers/PPDs/Contents/Resources/fujixerox-docucentre-s2110.ppd"
+
+lpadmin -x "\$QUEUE_NAME" 2>/dev/null || true
+lpadmin -p "\$QUEUE_NAME" \
+        -E \
+        -v "${PRINTER_URI}" \
+        -P "\$PPD_TARGET" \
+        -D "Fuji Xerox DocuCentre S2110" \
+        -L "${PRINTER_LOCATION}" \
+        -o printer-is-shared=false
+
+cupsenable "\$QUEUE_NAME" 2>/dev/null || true
+cupsaccept "\$QUEUE_NAME" 2>/dev/null || true
+
+rm -f /tmp/fujixerox_install_exec.sh
+INSTALL_EOF
+
+chmod 755 "$TEMP_INSTALL_SH"
+
+# 4. 触发系统管理员授权 (Touch ID 或密码提权)
+AUTH_STATUS=$(osascript << EOF
+try
+    do shell script "bash $TEMP_INSTALL_SH" with administrator privileges with prompt "富士施乐打印机驱动向导需要您的授权，以安装系统级滤镜并注册打印机队列："
+    return "SUCCESS"
+on error errMsg number errNum
+    if errNum is -128 then
+        return "CANCELLED"
+    else
+        return errMsg
+    fi
+end try
+EOF
+)
+
+if [ "$AUTH_STATUS" = "SUCCESS" ]; then
+    osascript -e "display dialog \"【驱动安装并配置成功】\n\n富士施乐 DocuCentre S2110 已在您的 Mac 上成功就绪！\n\n设备地址: ${PRINTER_URI}\n打印解析度: 600 x 600 DPI (高清纯正黑白)\n\n您现在可以在任意软件 (Word、PDF、浏览器等) 中直接按快捷键 Cmd + P 发送打印。\" with title \"配置成功\" buttons {\"完成\"} default button \"完成\" with icon note"
+elif [ "$AUTH_STATUS" != "CANCELLED" ]; then
+    osascript -e "display alert \"安装失败\" message \"执行过程中出现错误: $AUTH_STATUS\" as critical"
+fi
+
+exit 0

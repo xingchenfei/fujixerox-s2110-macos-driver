@@ -1,0 +1,134 @@
+*PPD-Adobe: "4.3"
+*%
+*% CUPS PostScript Printer Description (PPD) File
+*% Model: Fuji Xerox DocuCentre S2110 / S2011 / S2320 / S2520
+*% Language: HBPL (Host Based Print Language)
+*% Driver: rastertohbpl Native CUPS Filter for macOS
+*% Target: Apple Silicon (M1/M2/M3/M4) & Intel x86_64
+*%
+*FormatVersion: "4.3"
+*FileVersion: "1.0.0"
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*PCFileName: "FXS2110.PPD"
+*Manufacturer: "Fuji Xerox"
+*Product: "(DocuCentre S2110)"
+*ModelName: "Fuji Xerox DocuCentre S2110"
+*ShortNickName: "FX DocuCentre S2110"
+*NickName: "Fuji Xerox DocuCentre S2110 (HBPL Native CUPS Driver)"
+*PSVersion: "(3010.000) 550"
+*LanguageLevel: "3"
+*ColorDevice: False
+*DefaultColorSpace: Gray
+*FileSystem: False
+*Throughput: "21"
+*LandscapeOrientation: Plus90
+*TTRasterizer: Type42
+*1284DeviceID: "MFG:Fuji Xerox;MDL:DocuCentre S2110;CMD:HBPL;"
+
+*% 核心转译滤镜定义 (macOS SIP 合规独立路径)
+*cupsFilter: "application/vnd.cups-raster 0 /Library/Printers/FujiXerox/Filters/rastertohbpl"
+
+*% 分辨率选项 (默认 600 DPI 高清输出)
+*OpenUI *Resolution/Output Resolution: PickOne
+*OrderDependency: 10 AnySetup *Resolution
+*DefaultResolution: 600dpi
+*Resolution 600dpi/600 x 600 DPI (High Quality): "<</HWResolution[600 600]>>setpagedevice"
+*CloseUI: *Resolution
+
+*% 颜色模式 (纯黑白灰度)
+*OpenUI *ColorModel/Color Mode: PickOne
+*OrderDependency: 10 AnySetup *ColorModel
+*DefaultColorModel: Gray
+*ColorModel Gray/Grayscale (8-bit): "<</cupsColorSpace 0/cupsColorOrder 0/cupsBitsPerColor 8/cupsBitsPerPixel 8>>setpagedevice"
+*ColorModel Black/Monochrome (1-bit): "<</cupsColorSpace 3/cupsColorOrder 0/cupsBitsPerColor 1/cupsBitsPerPixel 1>>setpagedevice"
+*CloseUI: *ColorModel
+
+*% 纸张规格选项
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: A4
+*PageSize A4/A4 (210 x 297 mm): "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageSize A3/A3 (297 x 420 mm): "<</PageSize[842 1191]/ImagingBBox null>>setpagedevice"
+*PageSize B4/B4 (257 x 364 mm): "<</PageSize[729 1032]/ImagingBBox null>>setpagedevice"
+*PageSize B5/B5 (182 x 257 mm): "<</PageSize[516 729]/ImagingBBox null>>setpagedevice"
+*PageSize Letter/Letter (8.5 x 11 in): "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageSize Legal/Legal (8.5 x 14 in): "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageSize 8K/8K (267 x 388 mm): "<</PageSize[757 1100]/ImagingBBox null>>setpagedevice"
+*PageSize 16K/16K (194 x 267 mm): "<</PageSize[550 757]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+
+*% 纸张物理边界 (PageRegion)
+*OpenUI *PageRegion/Media Region: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: A4
+*PageRegion A4/A4: "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageRegion A3/A3: "<</PageSize[842 1191]/ImagingBBox null>>setpagedevice"
+*PageRegion B4/B4: "<</PageSize[729 1032]/ImagingBBox null>>setpagedevice"
+*PageRegion B5/B5: "<</PageSize[516 729]/ImagingBBox null>>setpagedevice"
+*PageRegion Letter/Letter: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageRegion Legal/Legal: "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageRegion 8K/8K: "<</PageSize[757 1100]/ImagingBBox null>>setpagedevice"
+*PageRegion 16K/16K: "<</PageSize[550 757]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+
+*% 可成像区域 (边距 4mm)
+*DefaultImageableArea: A4
+*ImageableArea A4/A4: "11.34 11.34 583.66 830.66"
+*ImageableArea A3/A3: "11.34 11.34 830.66 1179.66"
+*ImageableArea B4/B4: "11.34 11.34 717.66 1020.66"
+*ImageableArea B5/B5: "11.34 11.34 504.66 717.66"
+*ImageableArea Letter/Letter: "11.34 11.34 600.66 780.66"
+*ImageableArea Legal/Legal: "11.34 11.34 600.66 996.66"
+*ImageableArea 8K/8K: "11.34 11.34 745.66 1088.66"
+*ImageableArea 16K/16K: "11.34 11.34 538.66 745.66"
+
+*% 物理纸张尺寸 (单位: Point)
+*DefaultPaperDimension: A4
+*PaperDimension A4/A4: "595 842"
+*PaperDimension A3/A3: "842 1191"
+*PaperDimension B4/B4: "729 1032"
+*PaperDimension B5/B5: "516 729"
+*PaperDimension Letter/Letter: "612 792"
+*PaperDimension Legal/Legal: "612 1008"
+*PaperDimension 8K/8K: "757 1100"
+*PaperDimension 16K/16K: "550 757"
+
+*% 纸盒进纸选项 (InputSlot)
+*OpenUI *InputSlot/Paper Source: PickOne
+*OrderDependency: 20 AnySetup *InputSlot
+*DefaultInputSlot: Auto
+*InputSlot Auto/Auto Select (自动选择): ""
+*InputSlot Tray1/Tray 1 (纸盒 1): "<</MediaPosition 1>>setpagedevice"
+*InputSlot Tray2/Tray 2 (纸盒 2 - 选配件): "<</MediaPosition 2>>setpagedevice"
+*InputSlot Bypass/Bypass Tray (旁路手送托盘): "<</MediaPosition 3>>setpagedevice"
+*CloseUI: *InputSlot
+
+*% 双面打印选项 (Duplex)
+*OpenUI *Duplex/2-Sided Printing: PickOne
+*OrderDependency: 30 AnySetup *Duplex
+*DefaultDuplex: None
+*Duplex None/Off (1-Sided 单面): "<</Duplex false>>setpagedevice"
+*Duplex DuplexNoTumble/Long-Edge Binding (长边翻转双面): "<</Duplex true/Tumble false>>setpagedevice"
+*Duplex DuplexTumble/Short-Edge Binding (短边翻转双面): "<</Duplex true/Tumble true>>setpagedevice"
+*CloseUI: *Duplex
+
+*% 节墨模式 (Toner Save)
+*OpenUI *JCLTonerSave/Toner Save Mode: PickOne
+*OrderDependency: 40 JCLSetup *JCLTonerSave
+*DefaultJCLTonerSave: Standard
+*JCLTonerSave Standard/Standard (标准省墨关): ""
+*JCLTonerSave Save/Save (节墨开启): ""
+*CloseUI: *JCLTonerSave
+
+*% 复合机特有 JCL 协议头注入定义
+*JCLBegin: "<1B>%-12345X@PJL<0D><0A>"
+*JCLToPSInterpreter: ""
+*JCLEnd: "<1B>%-12345X@PJL EOJ<0D><0A><1B>%-12345X"
+
+*% PPD 文件结束
+*DefaultFont: Courier
+*Font Courier: Standard "(002.004S)" Standard ROM
+*Font Helvetica: Standard "(001.006S)" Standard ROM
+*Font Times-Roman: Standard "(001.007S)" Standard ROM
+*Font Symbol: Special "(001.007S)" Special ROM

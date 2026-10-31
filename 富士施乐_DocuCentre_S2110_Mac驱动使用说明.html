@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>富士施乐 DocuCentre S2110 macOS 专用驱动 - 安装与使用指南</title>
+<style>
+  :root {
+    --primary: #0071e3;
+    --primary-hover: #0077ed;
+    --bg: #f5f5f7;
+    --card-bg: #ffffff;
+    --text: #1d1d1f;
+    --text-sec: #86868b;
+    --border: #d2d2d7;
+    --success: #34c759;
+    --warning: #ff9500;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header-title {
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge {
+    background: #e8f3ff;
+    color: var(--primary);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+  .container {
+    max-width: 860px;
+    margin: 32px auto 80px;
+    padding: 0 20px;
+  }
+  .hero {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .hero h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin: 0 0 12px 0;
+  }
+  .hero p {
+    font-size: 17px;
+    color: var(--text-sec);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .card h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .step-num {
+    background: var(--primary);
+    color: #fff;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .code-box {
+    background: #1e1e1e;
+    color: #f8f8f2;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-family: "SF Mono", Menlo, Consolas, Monaco, monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    margin: 12px 0;
+  }
+  .tag-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .tag-item {
+    background: #fbfbfd;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .tag-item strong {
+    display: block;
+    color: var(--text);
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  .tag-item span {
+    font-size: 13px;
+    color: var(--text-sec);
+  }
+  .callout {
+    background: #eef7ee;
+    border-left: 4px solid var(--success);
+    padding: 14px 18px;
+    border-radius: 0 10px 10px 0;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .callout.warn {
+    background: #fff8eb;
+    border-left-color: var(--warning);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">
+    <span>🖨️ 富士施乐 DocuCentre S2110 macOS 驱动</span>
+    <span class="badge">HBPL 原生重构版</span>
+  </div>
+  <div>
+    <span style="font-size:12px;color:var(--text-sec);">适配 macOS Monterey / Ventura / Sonoma / Sequoia</span>
+  </div>
+</header>
+
+<div class="container">
+  <div class="hero">
+    <h1>富士施乐数码复合机 macOS 专用驱动</h1>
+    <p>免购置 PostScript 硬件扩展卡 · 600 DPI 矢量级高清解析 · 原生双面与多纸盒支持</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-num">!</span> 为什么需要本驱动？</h2>
+    <p>富士施乐（Fuji Xerox）中小型商用复合机（如 <strong>DocuCentre S2110 / S2011 / S2320 / S2520</strong> 等）出厂采用主机端压缩打印语言 <strong>HBPL</strong>。官方未标配昂贵的 PostScript 芯片，导致在 Mac 上直接使用通用驱动会出现：</p>
+    <ul>
+      <li><strong>狂吐废纸</strong>：打印机连续吐出带有 <code>%!PS-Adobe-3.0</code> 或代码乱码的多张废纸。</li>
+      <li><strong>文字发灰有锯齿</strong>：macOS 内置通用 PCL 锁死在 300 DPI 点阵抖动，文字毛刺严重。</li>
+      <li><strong>本驱动解决方案</strong>：逆向原厂 Windows 通信协议，打造专供 macOS 的 CUPS 滤镜，直接输出纯正的 600 DPI HBPL 二进制流，字迹锐利纯黑，出纸顺畅。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-num">1</span> 方式一：使用图形向导 App 安装（推荐）</h2>
+    <ol>
+      <li>双击打开下载的 <strong><code>FujiXerox_DocuCentre_S2110_Mac_Driver.dmg</code></strong> 镜像。</li>
+      <li>双击运行 <strong>「富士施乐打印机一键配置向导.app」</strong>。</li>
+      <li>根据向导提示选择连接方式：
+        <ul>
+          <li><strong>网络打印 (TCP/IP)</strong>：输入打印机的局域网 IP（例如 <code>192.168.1.200</code>），向导将严格校验 IPv4 格式。</li>
+          <li><strong>USB 直连</strong>：插上 USB 数据线，向导会自动识别并绑定设备。</li>
+        </ul>
+      </li>
+      <li>弹出系统提权提示时，输入 Mac 管理员开机密码或轻触 Touch ID 允许。</li>
+      <li>提示“配置成功”后即可在任意软件中按 <code>Cmd + P</code> 正常打印！</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-num">2</span> 方式二：双击终端脚本安装</h2>
+    <p>如果您习惯终端操作，或在无界面批量分发环境下：</p>
+    <ol>
+      <li>打开 DMG 镜像，直接双击运行 <strong><code>双击安装驱动.command</code></strong>。</li>
+      <li>终端将自动引导选择连接类型与输入 IP 地址，并完成系统 CUPS 队列注册。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-num">3</span> 驱动核心特性与选项设置</h2>
+    <div class="tag-grid">
+      <div class="tag-item">
+        <strong>⚡ 600 DPI 矢量级高清解析</strong>
+        <span>点对点纯黑锐利字体，消灭发灰与毛刺锯齿。</span>
+      </div>
+      <div class="tag-item">
+        <strong>📄 丰富纸张尺寸支持</strong>
+        <span>原生支持 A3、A4、A5、B4、B5、8K、16K、Letter、Legal。</span>
+      </div>
+      <div class="tag-item">
+        <strong>🔄 原生双面打印 (Duplex)</strong>
+        <span>支持单面、长边翻转双面与短边翻转双面，装订轻松自如。</span>
+      </div>
+      <div class="tag-item">
+        <strong>📥 多纸盒进纸管理</strong>
+        <span>支持自动选择、第一纸盒、第二纸盒（选配）及旁路手送托盘。</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-num">4</span> 驱动卸载方法</h2>
+    <p>如需从系统中彻底移除该驱动：</p>
+    <ul>
+      <li>在 DMG 中双击运行 <strong>「卸载驱动.app」</strong>；</li>
+      <li>或双击运行 <strong><code>双击卸载驱动.command</code></strong>，即可一键清理打印队列与系统驱动文件。</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <strong>💡 打印排障小贴士：</strong>
+    若打印机没有反应，请检查打印机屏幕是否显示“离线”或“缺纸”，并在“系统设置 -> 打印机与扫描仪”中确认打印队列状态是否为“空闲”。如果打印机 IP 地址变更，重新运行配置向导输入新 IP 即可。
+  </div>
+</div>
+
+</body>
+</html>

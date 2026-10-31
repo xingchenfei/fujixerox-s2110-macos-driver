@@ -1,0 +1,22 @@
+#!/bin/bash
+CONFIRM=$(osascript << 'APPLESCRIPT'
+try
+    set dlg to display dialog "您确定要卸载 富士施乐 (Fuji Xerox) DocuCentre S2110 打印机驱动吗？" with title "确认卸载" buttons {"取消", "确定卸载"} default button "确定卸载" with icon caution
+    return "OK"
+on error number -128
+    return "CANCEL"
+end try
+APPLESCRIPT
+)
+
+if [ "$CONFIRM" = "OK" ]; then
+    osascript << 'APPLESCRIPT'
+    try
+        do shell script "lpadmin -x Fuji_Xerox_DocuCentre_S2110 2>/dev/null; rm -rf /Library/Printers/FujiXerox; rm -f /Library/Printers/PPDs/Contents/Resources/fujixerox-docucentre-s2110.ppd" with administrator privileges with prompt "卸载打印机驱动需要您的管理员授权："
+        display dialog "富士施乐 DocuCentre S2110 打印机驱动已成功从系统中移除。" with title "卸载成功" buttons {"好"} default button "好" with icon note
+    on error errMsg
+        display alert "卸载遇到问题" message errMsg as critical
+    end try
+APPLESCRIPT
+fi
+exit 0
