@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>富士施乐 S2110 驱动激活码生成器 (卖家专属 7天2FA)</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+  .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 440px; }
+  h2 { margin-top: 0; color: #1a1a1a; font-size: 20px; text-align: center; }
+  .desc { font-size: 13px; color: #666; margin-bottom: 20px; text-align: center; }
+  label { font-weight: 600; font-size: 14px; color: #333; display: block; margin-bottom: 6px; }
+  input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; margin-bottom: 16px; }
+  input:focus { border-color: #007aff; }
+  button { width: 100%; padding: 12px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
+  button:hover { background: #0062cc; }
+  .result-box { margin-top: 20px; padding: 15px; background: #f8f9fa; border: 1px dashed #007aff; border-radius: 8px; display: none; text-align: center; }
+  .res-key { font-size: 22px; font-weight: bold; color: #007aff; letter-spacing: 2px; margin: 10px 0; font-family: monospace; }
+  .copy-tip { font-size: 12px; color: #28a745; margin-top: 5px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>富士施乐 S2110 驱动离线算号器</h2>
+  <div class="desc">基于 7 天动态时效窗口 (2FA TOTP 算法，一机一码)</div>
+  
+  <label for="hwid">买家提供的【Mac 硬件识别码 / UUID】：</label>
+  <input type="text" id="hwid" placeholder="例如: 4C4C4544-0046-..." autocomplete="off">
+  
+  <button onclick="generateKey()">一键生成激活码</button>
+  
+  <div class="result-box" id="resBox">
+    <div style="font-size:13px;color:#555;">买家专用激活码 (7天内有效，绑定该机终身)：</div>
+    <div class="res-key" id="resKey">----</div>
+    <button style="background:#28a745;padding:8px;font-size:14px;" onclick="copyKey()">点击复制激活码</button>
+    <div class="copy-tip" id="copyTip" style="display:none;">已成功复制到剪贴板！可以直接发给买家。</div>
+  </div>
+</div>
+
+<script>
+// 密钥种子（与 Mac 驱动 auth_helper 二进制内部完全一致）
+const MASTER_SECRET = "XEROX_S2110_MACOS_SECRET_SALT_2026_@#!";
+const STEP_7_DAYS = 7 * 86400; // 604800 秒 (7天时效窗口)
+
+async function hmacSha256(keyStr, messageStr) {
+    const enc = new TextEncoder();
+    const keyData = enc.encode(keyStr);
+    const msgData = enc.encode(messageStr);
+    const key = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const signature = await crypto.subtle.sign("HMAC", key, msgData);
+    return new Uint8Array(signature);
+}
+
+async function generateKey() {
+    let raw = document.getElementById("hwid").value.trim();
+    if (!raw) { alert("请输入买家发来的设备识别码！"); return; }
+    
+    // 提取纯 UUID（过滤掉可能带的空格或杂质）
+    let cleanHw = raw.toUpperCase().replace(/[^A-F0-9-]/g, "");
+    let windowIdx = Math.floor(Date.now() / 1000 / STEP_7_DAYS);
+    let msg = `ACTIVATION:${cleanHw}:${windowIdx}`;
+    
+    let sig = await hmacSha256(MASTER_SECRET, msg);
+    let hex = Array.from(sig.slice(0, 6)).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+    let formattedKey = `${hex.substr(0,4)}-${hex.substr(4,4)}-${hex.substr(8,4)}`;
+    
+    document.getElementById("resKey").innerText = formattedKey;
+    document.getElementById("resBox").style.display = "block";
+    document.getElementById("copyTip").style.display = "none";
+}
+
+function copyKey() {
+    let key = document.getElementById("resKey").innerText;
+    navigator.clipboard.writeText(key).then(() => {
+        document.getElementById("copyTip").style.display = "block";
+    });
+}
+</script>
+</body>
+</html>

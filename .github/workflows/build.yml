@@ -16,24 +16,32 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Compile Native Mach-O Universal Binaries
+      - name: Compile Native Mach-O Universal Binaries (Anti-Reverse Hardened)
         run: |
           echo "=== 正在编译原生 Mach-O Universal 双架构二进制程序 ==="
           mkdir -p build/filters
+          mkdir -p build/bin
           
           # 1. 编译核心过滤器 rastertohbpl.c 为 Universal Binary (arm64 + x86_64) 并剥离符号
-          clang -O3 src/rastertohbpl.c -target arm64-apple-macos11 -o build/filters/filter_arm64
-          clang -O3 src/rastertohbpl.c -target x86_64-apple-macos10.15 -o build/filters/filter_x86_64
+          clang -O3 src/rastertohbpl.c -target arm64-apple-macos11 -framework IOKit -framework CoreFoundation -o build/filters/filter_arm64
+          clang -O3 src/rastertohbpl.c -target x86_64-apple-macos10.15 -framework IOKit -framework CoreFoundation -o build/filters/filter_x86_64
           lipo -create build/filters/filter_arm64 build/filters/filter_x86_64 -output build/filters/rastertohbpl
           strip -S -x build/filters/rastertohbpl
           file build/filters/rastertohbpl
+
+          # 2. 编译向导授权加密助手 auth_helper.c 为 Universal Binary 并进行完全符号剥离
+          clang -O3 src/auth_helper.c -target arm64-apple-macos11 -o build/bin/helper_arm64
+          clang -O3 src/auth_helper.c -target x86_64-apple-macos10.15 -o build/bin/helper_x86_64
+          lipo -create build/bin/helper_arm64 build/bin/helper_x86_64 -output build/bin/auth_helper
+          strip -S -x build/bin/auth_helper
+          file build/bin/auth_helper
 
       - name: Run Diagnostics & HBPL Protocol Self-Test
         run: |
           echo "=== 正在执行滤镜转译与 HBPL 协议自检 ==="
           cp build/filters/rastertohbpl tests/
           chmod +x tests/rastertohbpl
-          python3 tests/test_print.py
+          XEROX_TEST_MODE=1 python3 tests/test_print.py
 
       - name: Validate PPD Specification
         run: |
@@ -55,10 +63,13 @@ jobs:
           mkdir -p "${APP_PATH}/Contents/SharedSupport/filters"
           mkdir -p "${APP_PATH}/Contents/SharedSupport/ppd"
           
-          # 放入 Universal 二进制与源码后备
+          # 放入 Universal 过滤器二进制
           cp build/filters/rastertohbpl "${APP_PATH}/Contents/SharedSupport/filters/"
           chmod 755 "${APP_PATH}/Contents/SharedSupport/filters/rastertohbpl"
-          cp src/rastertohbpl.c "${APP_PATH}/Contents/SharedSupport/filters/"
+          
+          # 放入 Universal 向导授权加密助手 (抹除密钥与 2FA 明文)
+          cp build/bin/auth_helper "${APP_PATH}/Contents/MacOS/"
+          chmod 755 "${APP_PATH}/Contents/MacOS/auth_helper"
           
           # 放入 PPD
           cp ppd/fujixerox-docucentre-s2110.ppd "${APP_PATH}/Contents/SharedSupport/ppd/"
@@ -99,27 +110,25 @@ jobs:
       - name: Upload Driver DMG Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FujiXerox_DocuCentre_S2110_Mac_Driver_Verified
+          name: FujiXerox_DocuCentre_S2110_Commercial_Driver
           path: FujiXerox_DocuCentre_S2110_Mac_Driver.dmg
 
-      - name: Upload Mach-O Universal Binary Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: FujiXerox_S2110_Universal_Binaries
-          path: build/filters/rastertohbpl
-
-      - name: Create GitHub Release v1.0.0
+      - name: Create GitHub Release v1.1.0
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.0
-          name: "Fuji Xerox DocuCentre S2110 macOS Native Driver v1.0.0"
+          tag_name: v1.1.0
+          name: "Fuji Xerox DocuCentre S2110 macOS Commercial Driver (一机一码版) v1.1.0"
           body: |
-            ### 富士施乐 (Fuji Xerox) DocuCentre S2110 / S2011 / S2320 / S2520 macOS 专用驱动 (DMG 安装包)
+            ### 富士施乐 (Fuji Xerox) DocuCentre S2110 macOS 商业级专用驱动 (DMG 安装包 - 一机一码版)
             
-            - **无需加装 PostScript (PS) 硬件扩展卡**，原生支持 HBPL 协议。
-            - **原生 Universal Mach-O 二进制**：完整适配 Apple Silicon (M1/M2/M3/M4) 与 Intel 架构。
-            - **高清矢量渲染**：锁定 600 DPI 纯黑矢量输出，字迹锐利无毛刺发灰。
+            - **集成一机一码防盗版授权体系**：
+              - 硬件主板 UUID 物理强绑定（IOKit / IOPlatformUUID）；
+              - 7 天动态时效 2FA 离线激活码机制；
+              - 授权验证助手全量编译为符号剥离的 Mach-O 原生机器码，私钥内存动态解密；
+            - **无需加装 PostScript (PS) 硬件扩展卡**，原生支持 HBPL 协议；
+            - **原生 Universal Mach-O 二进制**：完整适配 Apple Silicon (M1/M2/M3/M4) 与 Intel 架构；
+            - **高清矢量渲染**：锁定 600 DPI 纯黑矢量输出，字迹锐利无毛刺发灰；
             - **原生图形化向导**：配备双击图形配置向导 App，支持网络与 USB 一键自动配置注册。
           files: |
             FujiXerox_DocuCentre_S2110_Mac_Driver.dmg

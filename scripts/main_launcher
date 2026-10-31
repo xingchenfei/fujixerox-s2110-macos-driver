@@ -1,15 +1,69 @@
 #!/bin/bash
 # ==============================================================================
 # 富士施乐 (Fuji Xerox) DocuCentre S2110 / S2011 macOS 图形化安装配置向导
-# 针对 HBPL 协议原生重构，免去购买 PostScript 硬件扩充模块
+# 集成 一机一码 + 7天动态时效 2FA 商业授权机制
 # ==============================================================================
 
 APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SUPPORT_DIR="${APP_DIR}/SharedSupport"
+HELPER_BIN="${APP_DIR}/MacOS/auth_helper"
 PPD_FILE="${SUPPORT_DIR}/ppd/fujixerox-docucentre-s2110.ppd"
 FILTER_BIN="${SUPPORT_DIR}/filters/rastertohbpl"
 
-# 1. 欢迎与连接方式选择对话框
+# 1. 提取 Mac 硬件主板 UUID (IOPlatformUUID)
+HW_UUID=$(ioreg -d2 -c IOPlatformExpertDevice 2>/dev/null | awk -F\" '/IOPlatformUUID/{print $4}' | tr -d '[:space:]' | tr '[:lower:]' '[:upper:]')
+if [ -z "$HW_UUID" ]; then
+    HW_UUID=$(system_profiler SPHardwareDataType 2>/dev/null | awk '/Hardware UUID/{print $3}' | tr -d '[:space:]' | tr '[:lower:]' '[:upper:]')
+fi
+if [ -z "$HW_UUID" ]; then
+    HW_UUID="XEROX-MAC-DEFAULT-UUID"
+fi
+
+# 2. 检查本机是否已永久授权激活
+LICENSE_FILE="/Library/Printers/FujiXerox/Custom/.license"
+ALREADY_ACTIVATED="false"
+
+if [ -f "$LICENSE_FILE" ] && [ -x "$HELPER_BIN" ]; then
+    SAVED_TOKEN=$(cat "$LICENSE_FILE" 2>/dev/null | tr -d '[:space:]')
+    if "$HELPER_BIN" check "$HW_UUID" "$SAVED_TOKEN" >/dev/null 2>&1; then
+        ALREADY_ACTIVATED="true"
+    fi
+fi
+
+# 3. 未激活状态启动一机一码授权流程
+if [ "$ALREADY_ACTIVATED" != "true" ]; then
+    # 自动将硬件识别码复制到系统剪贴板，极大方便用户粘贴发送给卖家
+    echo -n "$HW_UUID" | pbcopy 2>/dev/null || true
+
+    KEY_INPUT=$(osascript << EOF
+try
+    set dlg to display dialog "【富士施乐 DocuCentre S2110 商业驱动授权激活】\n\n您的 Mac 硬件识别码为:\n$HW_UUID\n\n(已自动复制到剪贴板，请将此代码发送给卖家获取 7天时效激活码)\n\n请输入激活密钥 (格式: XXXX-XXXX-XXXX):" default answer "" with title "软件授权验证 (7天 2FA 一机一码)" buttons {"取消", "验证激活"} default button "验证激活" with icon caution
+    return text returned of dlg
+on error number -128
+    return "CANCELLED"
+end try
+EOF
+)
+
+    if [ "$KEY_INPUT" = "CANCELLED" ] || [ -z "$KEY_INPUT" ]; then
+        exit 0
+    fi
+
+    # 清除买家可能带入的空格
+    CLEAN_KEY=$(echo "$KEY_INPUT" | tr -d '[:space:]')
+
+    # 调用原生 Mach-O 二进制执行校验并产出永久凭证
+    PERM_AUTH_TOKEN=$("$HELPER_BIN" verify "$HW_UUID" "$CLEAN_KEY" 2>/dev/null || true)
+
+    if [ -z "$PERM_AUTH_TOKEN" ]; then
+        osascript -e 'display alert "激活失败" message "激活码无效或已超过 7 天有效期限。\n请核对设备代码是否正确，或联系卖家重新获取。" as critical'
+        exit 0
+    fi
+else
+    PERM_AUTH_TOKEN="$SAVED_TOKEN"
+fi
+
+# 4. 欢迎与连接方式选择对话框
 CONN_CHOICE=$(osascript << 'EOF'
 try
     set dlg to display dialog "【富士施乐 DocuCentre S2110 专用驱动安装向导】\n\n本驱动原生支持 HBPL (Host Based Print Language) 协议，无需购置昂贵的 PostScript (PS) 硬件扩展卡，支持 600 DPI 矢量级高清打印与原生双面打印。\n\n请选择您的打印机连接方式：" with title "富士施乐配置向导 (1/2)" buttons {"取消", "USB 直连", "网络打印 (TCP/IP)"} default button "网络打印 (TCP/IP)" with icon note
@@ -28,7 +82,7 @@ PRINTER_URI=""
 PRINTER_LOCATION="办公区"
 
 if [ "$CONN_CHOICE" = "网络打印 (TCP/IP)" ]; then
-    # 2. 采集打印机 IP 地址并执行严格 IPv4 校验
+    # 5. 采集打印机 IP 地址并执行严格 IPv4 校验
     DEFAULT_IP_HINT="192.168.1.200"
 
     while true; do
@@ -71,16 +125,21 @@ else
     PRINTER_LOCATION="USB 本地接口"
 fi
 
-# 3. 生成安全部署临时脚本
+# 6. 生成安全部署临时脚本
 TEMP_INSTALL_SH="/tmp/fujixerox_install_exec.sh"
 cat << INSTALL_EOF > "$TEMP_INSTALL_SH"
 #!/bin/bash
 set -e
 
-# 创建系统级打印机驱动与滤镜目录
+# 创建系统级打印机驱动与授权目录
 mkdir -p /Library/Printers/FujiXerox/Filters
 mkdir -p /Library/Printers/FujiXerox/Custom
 mkdir -p /Library/Printers/PPDs/Contents/Resources
+
+# 写入一机一码永久授权凭证
+echo "${PERM_AUTH_TOKEN}" > /Library/Printers/FujiXerox/Custom/.license
+chmod 644 /Library/Printers/FujiXerox/Custom/.license
+chown root:wheel /Library/Printers/FujiXerox/Custom/.license
 
 # 安装原生滤镜
 cp -f "${FILTER_BIN}" /Library/Printers/FujiXerox/Filters/rastertohbpl
@@ -113,10 +172,10 @@ INSTALL_EOF
 
 chmod 755 "$TEMP_INSTALL_SH"
 
-# 4. 触发系统管理员授权 (Touch ID 或密码提权)
+# 7. 触发系统管理员授权 (Touch ID 或密码提权)
 AUTH_STATUS=$(osascript << EOF
 try
-    do shell script "bash $TEMP_INSTALL_SH" with administrator privileges with prompt "富士施乐打印机驱动向导需要您的授权，以安装系统级滤镜并注册打印机队列："
+    do shell script "bash $TEMP_INSTALL_SH" with administrator privileges with prompt "富士施乐打印机驱动向导需要您的授权，以写入永久授权文件并注册打印机队列："
     return "SUCCESS"
 on error errMsg number errNum
     if errNum is -128 then
@@ -129,7 +188,7 @@ EOF
 )
 
 if [ "$AUTH_STATUS" = "SUCCESS" ]; then
-    osascript -e "display dialog \"【驱动安装并配置成功】\n\n富士施乐 DocuCentre S2110 已在您的 Mac 上成功就绪！\n\n设备地址: ${PRINTER_URI}\n打印解析度: 600 x 600 DPI (高清纯正黑白)\n\n您现在可以在任意软件 (Word、PDF、浏览器等) 中直接按快捷键 Cmd + P 发送打印。\" with title \"配置成功\" buttons {\"完成\"} default button \"完成\" with icon note"
+    osascript -e "display dialog \"【永久激活并配置成功】\n\n富士施乐 DocuCentre S2110 已在您的 Mac 上永久授权！\n\n设备地址: ${PRINTER_URI}\n打印解析度: 600 x 600 DPI (高清纯正黑白)\n已绑定本机主板硬件代码，长期有效。\n\n您现在可以在任意软件 (Word、PDF、浏览器等) 中直接按快捷键 Cmd + P 发送打印。\" with title \"授权与配置成功\" buttons {\"完成\"} default button \"完成\" with icon note"
 elif [ "$AUTH_STATUS" != "CANCELLED" ]; then
     osascript -e "display alert \"安装失败\" message \"执行过程中出现错误: $AUTH_STATUS\" as critical"
 fi
