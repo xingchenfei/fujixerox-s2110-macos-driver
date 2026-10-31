@@ -113,24 +113,20 @@ jobs:
           name: FujiXerox_DocuCentre_S2110_Commercial_Driver
           path: FujiXerox_DocuCentre_S2110_Mac_Driver.dmg
 
-      - name: Create GitHub Release v2.0.0
+      - name: Create GitHub Release v2.0.1
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v2.0.0
-          name: "Fuji Xerox DocuCentre S2110 macOS Driver (全品牌统一算号版) v2.0.0"
+          tag_name: v2.0.1
+          name: "Fuji Xerox DocuCentre S2110 macOS Driver v2.0.1"
           body: |
-            ### 富士施乐 (Fuji Xerox) DocuCentre S2110 macOS 专用独立研发驱动 (DMG 安装包 - 统一算号版)
+            ### 富士施乐 (Fuji Xerox) DocuCentre S2110 macOS 专用独立研发驱动 (DMG 安装包)
             
-            - **接入全品牌统一离线算号体系 (Universal Keygen Protocol)**：一套算号器即可通发施乐、夏普、东芝、理光等所有品牌；
             - **作者亲自编写与调优的高性能 C 语言原生驱动套件**；
-            - **集成一机一码防盗版授权体系**：
-              - 硬件主板 UUID 物理强绑定（IOKit / IOPlatformUUID）；
-              - 7 天动态时效 2FA 离线激活码机制；
-              - 授权验证助手全量编译为符号剥离的 Mach-O 原生机器码，私钥内存动态解密；
+            - **纯正 600 DPI 矢量级高清解析**，字迹锐利纯黑无毛刺发灰；
             - **无需加装 PostScript (PS) 硬件扩展卡**，原生支持 HBPL 协议；
             - **原生 Universal Mach-O 二进制**：完整适配 Apple Silicon (M1/M2/M3/M4) 与 Intel 架构；
-            - **高清矢量渲染**：锁定 600 DPI 纯黑矢量输出，字迹锐利无毛刺发灰；
-            - **原生图形化向导**：配备双击图形配置向导 App，支持网络与 USB 一键自动配置注册。
+            - **原生图形化向导**：配备双击图形配置向导 App，支持网络与 USB 一键自动配置注册；
+            - **纯净买家交付规范**：DMG 内置用户文档纯粹面向使用者，无内部算号机制露出。
           files: |
             FujiXerox_DocuCentre_S2110_Mac_Driver.dmg
